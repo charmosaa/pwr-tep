@@ -1,0 +1,3 @@
+equation not complete
+forbidden chars in the equation
+
