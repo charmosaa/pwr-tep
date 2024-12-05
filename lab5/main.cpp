@@ -19,7 +19,9 @@ private:
 int main() {
     // Test 1: Basic functionality
     {
-        MySmartPointer<TestObject> sp1(new TestObject(42));
+       // TestObject t(45);
+       // MySmartPointer<TestObject> sp1(&t); //gdy statycznie zalokujemy podwojnie usunie nam objekt (bedzie próbował)
+        MySmartPointer<TestObject> sp1(new TestObject(45));
         std::cout << "Value in sp1: " << sp1->getValue() << std::endl;
         sp1->setValue(100);
         std::cout << "Updated value in sp1: " << (*sp1).getValue() << std::endl;
