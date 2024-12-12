@@ -11,8 +11,10 @@ class MyTree
         MyTree();
         MyTree(std::vector<std::string> values);
         MyTree(const MyTree& otherTree);
-        MyTree operator=(const MyTree &otherTree);
-        MyTree operator+(const MyTree &otherTree);
+        MyTree(MyTree &&otherTree);
+        MyTree& operator=(MyTree &&otherTree);
+        MyTree& operator=(MyTree &otherTree);
+        MyTree operator+(MyTree &otherTree);
         virtual ~MyTree();
         MyNode* root;
         void setLeftChild(MyTree *child);
@@ -24,7 +26,7 @@ class MyTree
         std::map <std::string, std::string> variables;
         double calculateOutput();
         MyNode* getLeftMostChild();
-        void addSubTree(MyTree* newTree);
+        void addSubTree(const MyTree& newTree);
         MyTree optimizeTree();
         friend std::ostream& operator<<(std::ostream& os, MyTree& obj);
     protected:

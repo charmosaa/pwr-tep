@@ -63,7 +63,7 @@ MyNode :: MyNode(std::string value)
         childNodes = new MyNode*[children];
 }
 
-MyNode :: MyNode(MyNode& otherNode)
+MyNode :: MyNode(const MyNode& otherNode)
 {
     isNumber = otherNode.isNumber;
     isOperator = otherNode.isOperator;
@@ -114,7 +114,9 @@ void MyNode:: setParent(MyNode* parent)
 }
 
 std::string MyNode :: toEquation()
-{
+{   
+    if(this == nullptr)
+        return "EMPTY TREE";
     std::string equation;
     equation = nodeValue;
     for(int i=0;i<children;i++)

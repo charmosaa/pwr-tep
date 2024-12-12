@@ -5,6 +5,8 @@
 #include "MyTree.h"
 #include "MyNode.h"
 
+#define TEST_OPTIMIZED
+
 MyTree :: MyTree()
 {
     root = nullptr;
@@ -54,21 +56,30 @@ MyTree :: MyTree(std::vector<std::string> values)
 MyTree::MyTree(const MyTree& otherTree)
 {
     root = new MyNode(*otherTree.root);
+    std::cout<<"COPY\n";
+}
+
+MyTree::MyTree(MyTree &&otherTree)
+{
+    root = otherTree.root;
+    otherTree.root = nullptr;
+    std::cout<<"MOVE\n";
 }
 
 MyTree :: ~MyTree()
 {
+    std::string name = toString();
     delete root;
-    std::cout<<"tree deleted\n"<<std::endl;
+    std::cout<<"TREE "<<name<<" DELETED\n"<<std::endl;
 }
 
 
-void MyTree :: setLeftChild(MyTree *child)
+void MyTree::setLeftChild(MyTree *child)
 {
     root->setLeftChild(child->root);
     (child->root)->setParent(root);
 }
-void MyTree :: setRightChild(MyTree *child)
+void MyTree::setRightChild(MyTree *child)
 {
     root->setRightChild(child->root);
     (child->root)->setParent(root);
@@ -102,27 +113,43 @@ MyNode* MyTree:: getLeftMostChild()
     return root->getLeftMostChild();
 }
 
-void MyTree:: addSubTree(MyTree* newTree)
+void MyTree:: addSubTree(const MyTree& newTree) // to be checked
 {
+    MyNode* rootCopy = new MyNode(*newTree.root);
     MyNode* nodeToSubstitute = getLeftMostChild();
-    nodeToSubstitute->parentNode->setLeftChild(newTree->root);
-    newTree->root->setParent(nodeToSubstitute->parentNode);
+    nodeToSubstitute->parentNode->setLeftChild(rootCopy);
+    rootCopy->setParent(nodeToSubstitute->parentNode);
     delete nodeToSubstitute;
 }
 
-MyTree MyTree:: operator=(const MyTree &otherTree)
+MyTree& MyTree::operator=(MyTree &&otherTree)
 {
-    delete root;
-    root = new MyNode(*otherTree.root);
+    if (this != &otherTree) 
+    {
+        delete root;
+        root = otherTree.root;
+        otherTree.root = nullptr;
+    }
+    return *this;
+}
+
+MyTree& MyTree::operator=(MyTree &otherTree)
+{
+    if (this != &otherTree) 
+    {    
+        delete root;
+        root = new MyNode(*otherTree.root);
+    }
     return *this;
 }
         
         
-MyTree MyTree:: operator+(const MyTree &otherTree)
+MyTree MyTree:: operator+(MyTree &otherTree)
 {
     MyTree newTree(*this);
-    newTree.addSubTree(new MyTree(otherTree));
+    newTree.addSubTree(otherTree); 
     return newTree;
+    //return (std::move(newTree));
 }
 
 MyTree MyTree:: optimizeTree()

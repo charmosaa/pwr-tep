@@ -8,7 +8,7 @@ class MyNode
     public:
         MyNode();
         MyNode(std::string value);
-        MyNode(MyNode& otherNode);
+        MyNode(const MyNode& otherNode);
         virtual ~MyNode();
         bool isNumber;
         bool isOperator;
