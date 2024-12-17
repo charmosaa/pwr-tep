@@ -130,6 +130,7 @@ MyTree& MyTree::operator=(MyTree &&otherTree)
         root = otherTree.root;
         otherTree.root = nullptr;
     }
+    std::cout<<"MOVE\n";
     return *this;
 }
 
@@ -140,6 +141,7 @@ MyTree& MyTree::operator=(MyTree &otherTree)
         delete root;
         root = new MyNode(*otherTree.root);
     }
+    std::cout<<"COPY\n";
     return *this;
 }
         

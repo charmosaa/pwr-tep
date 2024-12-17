@@ -93,7 +93,7 @@ MyNode::~MyNode()
     for(int i=0;i<children;i++)
         delete childNodes[i];
     delete[] childNodes;
-    std::cout<<nodeValue<<"deleted"<<std::endl;
+   // std::cout<<nodeValue<<"deleted"<<std::endl;
 }
 
 void MyNode:: setLeftChild(MyNode* child)
