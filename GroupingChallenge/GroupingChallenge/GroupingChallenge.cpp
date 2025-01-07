@@ -30,6 +30,7 @@ int main()
 	{
 		c_optimizer.vRunIteration();
 	}
+	
 
 	delete pc_evaluator;
 

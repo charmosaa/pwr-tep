@@ -2,6 +2,7 @@
 #define OPTIMIZER_H
 
 #include "GroupingEvaluator.h"
+#include "GeneticAlgorithm.h"
 
 #include <iostream>
 #include <numeric>
@@ -24,10 +25,9 @@ namespace NGroupingChallenge
 
 	private:
 		CGroupingEvaluator& c_evaluator; 
-
+		GeneticAlgorithm geneticAlgorithm;
 		double d_current_best_fitness;
 		vector<int> v_current_best;
-
 		mt19937 c_random_engine;
 	};
 }

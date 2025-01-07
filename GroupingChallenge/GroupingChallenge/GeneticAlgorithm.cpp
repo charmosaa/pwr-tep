@@ -1,58 +1,122 @@
 #include "GeneticAlgorithm.h"
+#include <iostream>
 
 using namespace NGroupingChallenge;
 
-GeneticAlgorithm::GeneticAlgorithm(double popSize, double crossProb, double mutProb, CGroupingEvaluator* evaluator): popSize(popSize),crossProb(crossProb), mutProb(mutProb),evaluator(evaluator),randomNumberGenerator(SEED)
+GeneticAlgorithm::GeneticAlgorithm(int popSize, double crossProb, double mutProb, CGroupingEvaluator& evaluator): popSize(popSize),crossProb(crossProb), mutProb(mutProb),evaluator(evaluator),randomNumberGenerator(std::random_device{}())
 {
     populate();
+    printPopulation();
 }
+
+ GeneticAlgorithm::~GeneticAlgorithm()
+ {
+    deletePopulation();
+ }
 
 void GeneticAlgorithm::populate()
 {
-    population.clear();
+    population = vector<Individual*>(popSize, nullptr);
     for(int i=0;i<popSize;i++)
     {
-        population.push_back(new Individual(evaluator));   
+        population[i] = new Individual(evaluator);   
     }
 }
 
-std::pair <Individual*, Individual*> GeneticAlgorithm::selectParents()
+Individual* GeneticAlgorithm::tournamentSelection()
 {
-    std::uniform_int_distribution<int> parentDist(0, popSize - 1);
+    std::uniform_int_distribution<int> dist(0, popSize - 1);
+    Individual* best = nullptr;
 
-    int firstParentPosition = parentDist(randomNumberGenerator);
-    int firstSecondParentPosition = parentDist(randomNumberGenerator);
-    Individual* parent1 = population[firstParentPosition];
-    Individual* parent12 = population[firstSecondParentPosition];
+        for (int i = 0; i < TOURNAMENT_SIZE; ++i)
+        {
+            int index = dist(randomNumberGenerator);
+            Individual* candidate = population[index];
 
-    if(parent1->getFitness() < parent12->getFitness())
-    {
-        parent1 = parent12;
-        firstParentPosition = firstSecondParentPosition;
-    }   
-
-    int secondParentPosition = parentDist(randomNumberGenerator);
-    int secondSecondParentPosition = parentDist(randomNumberGenerator);
-    Individual* parent2 = population[secondParentPosition];
-    Individual* parent22 = population[secondSecondParentPosition];
-
-    if((parent2->getFitness() < parent22->getFitness() && secondSecondParentPosition != firstParentPosition) || secondParentPosition == firstParentPosition)
-        parent2 = parent22;
-
-    return {
-        parent1,
-        parent2
-    };
+            if (best == nullptr || candidate->getFitness() > best->getFitness())
+                best = candidate;
+        }
+    return best;
 }
 
-Individual GeneticAlgorithm::getBestSolution()
+Individual& GeneticAlgorithm::selectParent()
 {
-    Individual* bestSolution = population[0];
+    Individual& parent = *tournamentSelection();
+    return parent;
+}
+
+Individual& GeneticAlgorithm::getBestIndividual()
+{
+    Individual* bestIndividual = population[0];
     for(int i=1;i<popSize;i++)
     {
-        if(population[i]->getFitness() > bestSolution->getFitness())
-            bestSolution = population[i];
+        if(population[i]->getFitness() > bestIndividual->getFitness())
+            bestIndividual = population[i];
     }
 
-    return *bestSolution;
+    return *bestIndividual;
 }
+
+void GeneticAlgorithm::run(int numIterations)
+{
+    for(int i=0;i<numIterations;i++)
+        runIteration();
+}
+
+void GeneticAlgorithm::runIteration()
+{
+    vector<Individual*>newPopulation(popSize,nullptr);
+    int newSize = 0;
+    while(newSize<popSize)
+    {
+        Individual* p1  = tournamentSelection();
+        Individual* p2 = tournamentSelection();
+
+        std::pair<Individual, Individual> children = p1->crossover(*p2,crossProb);
+
+        Individual* child1 = new Individual(children.first);
+        child1->mutate(mutProb, NUM_GROUPS);
+        newPopulation[newSize] = child1;
+        newSize++;
+
+        // if(newSize<popSize)
+            Individual* child2 = new Individual(children.second);
+            child2->mutate(mutProb, NUM_GROUPS);
+            newPopulation[newSize] = child2;
+            newSize++;
+        
+
+        std::cout<<"patrent1: ";
+        p1->printGenotype();
+        std::cout<<"\npatrent2: ";
+        p2->printGenotype();
+        std::cout<<"\n\n";
+
+        std::cout<<"child1: ";
+        child1->printGenotype();
+        std::cout<<"\nchild2: ";
+        child2->printGenotype();
+        std::cout<<"\n\n";
+    }
+    deletePopulation();
+    population = newPopulation;//std::move
+}
+
+void GeneticAlgorithm::deletePopulation()//check that
+{
+    for(int i=0;i<popSize;i++)
+        delete population[i];
+    population.clear();
+    population = vector<Individual*>(popSize, nullptr);
+}
+
+void GeneticAlgorithm::printPopulation()
+{
+    for(int i=0;i<popSize;i++)
+    {
+        std::cout<<i<<": ";
+        population[i]->printGenotype();
+        std::cout<<std::endl;
+    }
+    std::cout<<"----------------------"<<std::endl;
+}    
