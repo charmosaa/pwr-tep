@@ -4,7 +4,7 @@
 using namespace NGroupingChallenge;
 
 COptimizer::COptimizer(CGroupingEvaluator& cEvaluator)
-	: c_evaluator(cEvaluator), geneticAlgorithm(10, 0.7, 0.1, cEvaluator)
+	: c_evaluator(cEvaluator), geneticAlgorithm(cEvaluator)
 {
 	random_device c_seed_generator;
 	c_random_engine.seed(c_seed_generator());

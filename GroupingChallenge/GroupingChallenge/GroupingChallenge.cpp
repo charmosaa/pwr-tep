@@ -6,7 +6,7 @@ using namespace NGroupingChallenge;
 
 int main()
 {
-	CGaussianGroupingEvaluatorFactory c_evaluator_factory(5, 100);
+	CGaussianGroupingEvaluatorFactory c_evaluator_factory(9, 100);
 
 	c_evaluator_factory
 		.cAddDimension(-100, 100, 1.0, 1.0)

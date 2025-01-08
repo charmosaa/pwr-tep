@@ -57,17 +57,17 @@ std::pair<Individual, Individual> Individual::crossover(const Individual &other,
     Individual child2(other);
 
     if(probDist(randomNumberGenerator) < crossProb)
-    {    
-        std::uniform_int_distribution<int> dist(0, genotype.size() - 1);
-        int crossoverPoint = dist(randomNumberGenerator);
-
-        for(int i = crossoverPoint;i<numGenes;i++)
-            std::swap(child1.genotype[i],child2.genotype[i]);
+    {
+        for(int i = 0;i<numGenes;i++)
+        {
+            if(probDist(randomNumberGenerator) > 0.5)
+                std::swap(child1.genotype[i],child2.genotype[i]);
+        }   
     }
-//std::move
+
     return {
-        child1,
-        child2
+        std::move(child1),
+        std::move(child2)
     };
     
 }
