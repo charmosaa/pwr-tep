@@ -5,8 +5,6 @@
 #include "MyTree.h"
 #include "MyNode.h"
 
-#define TEST_OPTIMIZED
-
 MyTree :: MyTree()
 {
     root = nullptr;
@@ -56,14 +54,7 @@ MyTree :: MyTree(std::vector<std::string> values)
 MyTree::MyTree(const MyTree& otherTree)
 {
     root = new MyNode(*otherTree.root);
-    std::cout<<"COPY\n";
-}
-
-MyTree::MyTree(MyTree &&otherTree)
-{
-    root = otherTree.root;
-    otherTree.root = nullptr;
-    std::cout<<"MOVE\n";
+    std::cout<<"COPY CONSTRUCTOR\n";
 }
 
 MyTree :: ~MyTree()
@@ -113,7 +104,7 @@ MyNode* MyTree:: getLeftMostChild()
     return root->getLeftMostChild();
 }
 
-void MyTree:: addSubTree(const MyTree& newTree) // to be checked
+void MyTree:: addSubTree(const MyTree& newTree) 
 {
     MyNode* rootCopy = new MyNode(*newTree.root);
     MyNode* nodeToSubstitute = getLeftMostChild();
@@ -122,7 +113,15 @@ void MyTree:: addSubTree(const MyTree& newTree) // to be checked
     delete nodeToSubstitute;
 }
 
-MyTree& MyTree::operator=(MyTree &&otherTree)
+#ifndef TEST_OPTIMIZED
+MyTree::MyTree(MyTree&& otherTree)
+{
+    root = otherTree.root;
+    otherTree.root = nullptr;
+    std::cout<<"MOVE CONSTRUCTOR\n";
+}
+
+MyTree& MyTree::operator=(MyTree&& otherTree)
 {
     if (this != &otherTree) 
     {
@@ -133,8 +132,9 @@ MyTree& MyTree::operator=(MyTree &&otherTree)
     std::cout<<"MOVE\n";
     return *this;
 }
+#endif
 
-MyTree& MyTree::operator=(MyTree &otherTree)
+MyTree& MyTree::operator=(MyTree& otherTree)
 {
     if (this != &otherTree) 
     {    
@@ -146,12 +146,15 @@ MyTree& MyTree::operator=(MyTree &otherTree)
 }
         
         
-MyTree MyTree:: operator+(MyTree &otherTree)
+MyTree MyTree:: operator+(MyTree& otherTree)
 {
     MyTree newTree(*this);
     newTree.addSubTree(otherTree); 
+#ifdef TEST_OPTIMIZED
     return newTree;
-    //return (std::move(newTree));
+#else
+    return std::move(newTree);
+#endif
 }
 
 MyTree MyTree:: optimizeTree()

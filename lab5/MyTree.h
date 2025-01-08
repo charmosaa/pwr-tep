@@ -11,10 +11,17 @@ class MyTree
         MyTree();
         MyTree(std::vector<std::string> values);
         MyTree(const MyTree& otherTree);
-        MyTree(MyTree &&otherTree);
-        MyTree& operator=(MyTree &&otherTree);
-        MyTree& operator=(MyTree &otherTree);
-        MyTree operator+(MyTree &otherTree);
+
+#ifdef TEST_OPTIMIZED
+    MyTree(MyTree&&) = default; // Default move constructor
+    MyTree& operator=(MyTree&&) = default; // Default move assignment
+#else
+    MyTree(MyTree&& otherTree);
+    MyTree& operator=(MyTree&& otherTree); 
+#endif
+
+        MyTree& operator=(MyTree& otherTree);
+        MyTree operator+(MyTree& otherTree);
         virtual ~MyTree();
         MyNode* root;
         void setLeftChild(MyTree *child);
